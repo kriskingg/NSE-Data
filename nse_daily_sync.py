@@ -10,7 +10,7 @@ TODAY = datetime.today().date()
 FROM_DATE = TODAY - timedelta(days=ROLLING_DAYS)
 
 def download_bhavcopies(start, end):
-    with NSE(download_folder=DATA_DIR) as nse:
+    with NSE(download_folder=DATA_DIR, server=True) as nse:
         day = start
         while day <= end:
             try:
