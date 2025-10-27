@@ -1,31 +1,49 @@
 name: NSE Daily Sync
 
+# ----------------------------------------------------------
+# Permissions required for GitHub Actions to push updates
+# ----------------------------------------------------------
+permissions:
+  contents: write
+
+# ----------------------------------------------------------
+# Triggers: automatic every weekday 5:00 PM IST, or manual
+# ----------------------------------------------------------
 on:
   schedule:
-    - cron: "30 11 * * 1-5"   # 5:00 PM IST, Mon–Fri
-  workflow_dispatch:            # Allows manual run
+    - cron: "30 11 * * 1-5"   # Runs 5:00 PM IST (11:30 UTC) Mon–Fri
+  workflow_dispatch:           # Manual run option
 
+# ----------------------------------------------------------
+# Job definition
+# ----------------------------------------------------------
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # Step 1: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Step 2: Setup Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
+          pip install --quiet requests
           pip install --quiet git+https://github.com/BennyThadikaran/NseIndiaApi.git nse[server]
           pip install pandas
 
+      # Step 4: Run NSE sync script
       - name: Run NSE daily sync
         run: python nse_daily_sync.py
 
+      # Step 5: Commit and push any new data
       - name: Commit & push updated data
         run: |
           git config user.name "GitHub Actions"
